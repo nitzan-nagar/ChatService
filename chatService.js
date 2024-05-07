@@ -20,10 +20,12 @@ const io = new socketIO(server, {
     }
 });
 
+const userSocketMap = {};
 io.on("connection", (socket) => {
     console.log(`${socket.id} is connected !`);
 
     socket.on('join', (room, username) => {
+      userSocketMap[username] = socket.id;
       socket.join(room);
       console.log(`${socket.id} joined ${room}`)
       io.to(room).emit('userJoined',username)
@@ -32,10 +34,11 @@ io.on("connection", (socket) => {
     socket.on('disconnect', (room) => {
       io.to(room).emit('userLeft', socket.id)
     })
-    socket.on('chatMessage', ({room, sender, message}) => {
-      debugger
+
+    socket.on('chatMessage', ({room, sender, receiver, message}) => {
       console.log("Received Message:", { room, sender, message });
       io.to(room).emit('message', sender, message);
+      io.to(userSocketMap[receiver]).emit('pendingMessage', sender);
 
     });
 
