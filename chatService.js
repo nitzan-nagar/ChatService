@@ -42,9 +42,6 @@ io.on("connection", (socket) => {
 
     });
 
-    socket.on('message received', (id) => {
-      console.log(`Message with ID ${id} has been received by the recipient.`);
-    });
 })
 
 server.listen(PORT, () => {
